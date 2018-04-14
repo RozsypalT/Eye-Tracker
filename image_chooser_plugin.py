@@ -4,7 +4,7 @@ from pyglui import ui
 from audio import say
 import logging
 from zmq_tools import Msg_Receiver
-from gui import start
+from glfw import *
 
 logger = logging.getLogger(__name__)
 
@@ -19,11 +19,24 @@ class Image_Chooser(Plugin):
         def close():
             self.alive = False
 
+        def sth():
+            self.menu.label = 'Deffff'
+
+        def openw():
+            glfwInit()
+
+            window = glfwCreateWindow(200, 200, "pyglui demo", None, None)
+            if not window:
+                exit()
+
+            # Make the window's context current
+            glfw.make_context_current(window)
+
         self.add_menu()
         self.menu.label = 'Image Chooser'
         help_str = "After you press start the main application window appears."
         self.menu.append(ui.Info_Text(help_str))
-        self.menu.append(ui.Button('Start', start, outer_label='Start the main application'))
+        self.menu.append(ui.Button('Start', openw, outer_label='Start the main application'))
         self.menu.append(ui.Button('Close', close, outer_label='Close the plugin'))
 
     def deinit_ui(self):
