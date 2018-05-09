@@ -3,9 +3,8 @@ import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QCloseEvent
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
-
+from PyQt5.QtGui import QCloseEvent, QPixmap
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
 
 from ResultsWindow import Ui_ResultsWindow
 
@@ -16,7 +15,13 @@ class Ui_ChooserWindow(QMainWindow):
         self.finished = False
         self.chosenImages = []
         self.mainWin = mainWin
-        self.resWin = Ui_ResultsWindow(self.mainWin)
+        self.resWin = None
+        self.i = 0
+        self.j = 0
+        self.selected = []
+        self.rows = 0
+        self.cols = 0
+        self.highlighted = []
         self.setupUi(self)
 
     def setupUi(self, MainWindow):
@@ -34,14 +39,6 @@ class Ui_ChooserWindow(QMainWindow):
         self.finishButton.clicked.connect(self.showResults)
         self.gridLayout.addWidget(self.finishButton, 1, 2, 1, 1)
 
-        self.backButton = QtWidgets.QPushButton(self.centralwidget)
-        self.backButton.setObjectName("pushButton_5")
-        self.gridLayout.addWidget(self.backButton, 1, 0, 1, 1)
-
-        self.nextButton = QtWidgets.QPushButton(self.centralwidget)
-        self.nextButton.setObjectName("pushButton_2")
-        self.gridLayout.addWidget(self.nextButton, 1, 5, 1, 1)
-
         self.closeButton = QtWidgets.QPushButton(self.centralwidget)
         self.closeButton.setObjectName("pushButton")
         self.closeButton.clicked.connect(self.close)
@@ -55,8 +52,8 @@ class Ui_ChooserWindow(QMainWindow):
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
 
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.frame)
-        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.gallerygrid = QtWidgets.QGridLayout(self.frame)
+        self.gallerygrid.setObjectName("gridLayout_2")
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 6)
 
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -76,8 +73,6 @@ class Ui_ChooserWindow(QMainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Image Chooser"))
         self.finishButton.setText(_translate("MainWindow", "Finish"))
-        self.backButton.setText(_translate("MainWindow", "Back"))
-        self.nextButton.setText(_translate("MainWindow", "Next"))
         self.closeButton.setText(_translate("MainWindow", "Close"))
 
     def keyPressEvent(self, e):
@@ -100,6 +95,7 @@ class Ui_ChooserWindow(QMainWindow):
 
         if ans == QMessageBox.Ok:
             self.finished = True
+            self.resWin = Ui_ResultsWindow(self.mainWin)
             self.resWin.setChosenImages(self.chosenImages)
             self.resWin.show()
             self.close()
@@ -123,3 +119,37 @@ class Ui_ChooserWindow(QMainWindow):
                 QCloseEvent.ignore()
         else:
             self.close()
+
+    def organizeImages(self, filename):
+        if filename == '':
+            return
+        label = QLabel(self.frame)
+        pixmap = QPixmap(filename)
+        label.setFixedSize(200, 200)
+        modpixmap = pixmap.scaled(190, 190)
+        label.setPixmap(modpixmap)
+        label.setAlignment(Qt.AlignCenter)
+        label.setStyleSheet("background-color: white")
+        #label.mousePressEvent = lambda event: self.highlight(event, label)
+        #self.imageLabels.append(label)
+        self.gallerygrid.addWidget(label, self.i, self.j)
+
+        self.i = self.i + 1
+        if self.i == self.rows:
+            self.i = 0
+            self.j = self.j + 1
+
+    def loadImages(self, selected, rows, cols):
+        self.rows = rows
+        self.cols = cols
+        self.selected = selected
+        self.setupGrid()
+        for filename in self.selected:
+            self.organizeImages(filename)
+
+    def setupGrid(self):
+        for i in range(0, self.rows):
+            self.gallerygrid.setRowStretch(i, 1)
+
+        for i in range(0, self.cols):
+            self.gallerygrid.setColumnStretch(i, 1)

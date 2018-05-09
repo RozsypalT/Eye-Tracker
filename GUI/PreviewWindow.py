@@ -54,17 +54,13 @@ class Ui_PreviewWindow(QMainWindow):
         self.gallerygrid.setSpacing(20)
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 6)
 
-        self.nextButton = QtWidgets.QPushButton(self.centralwidget)
-        self.nextButton.setObjectName("pushButton_2")
-        self.nextButton.clicked.connect(self.switch)
-        self.gridLayout.addWidget(self.nextButton, 1, 5, 1, 1)
+        self.switchButton = QtWidgets.QPushButton(self.centralwidget)
+        self.switchButton.setObjectName("pushButton_2")
+        self.switchButton.clicked.connect(self.switch)
+        self.gridLayout.addWidget(self.switchButton, 1, 5, 1, 1)
 
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem1, 1, 1, 1, 1)
-
-        self.backButton = QtWidgets.QPushButton(self.centralwidget)
-        self.backButton.setObjectName("pushButton_5")
-        self.gridLayout.addWidget(self.backButton, 1, 0, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -76,19 +72,16 @@ class Ui_PreviewWindow(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def done(self):
-        self.close()
+        self.mainWin.updateSelected(self.selected)
         self.mainWin.show()
+        self.close()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Preview"))
         self.doneButton.setText(_translate("MainWindow", "Done"))
         self.closeButton.setText(_translate("MainWindow", "Close"))
-        self.nextButton.setText(_translate("MainWindow", "Next"))
-        self.backButton.setText(_translate("MainWindow", "Back"))
-
-    def setImages(self, images):
-        self.images = images
+        self.switchButton.setText(_translate("MainWindow", "Switch"))
 
     def highlight(self, event, label):
         if len(self.highlighted) == 0:
@@ -127,9 +120,6 @@ class Ui_PreviewWindow(QMainWindow):
             if lab == self.highlighted[1]:
                 self.secondIndex = i
 
-        print(self.firstIndex)
-        print(self.secondIndex)
-
         for lab in self.imageLabels:
             lab.close()
 
@@ -148,7 +138,7 @@ class Ui_PreviewWindow(QMainWindow):
         self.highlighted = []
 
         for lab in self.imageLabels:
-            self.gallerygrid.addWidget(lab, self.j, self.i)
+            self.gallerygrid.addWidget(lab, self.i, self.j)
             lab.show()
             self.i = self.i + 1
             if self.i == self.rows:
@@ -168,7 +158,7 @@ class Ui_PreviewWindow(QMainWindow):
             label.setStyleSheet("background-color: white")
             label.mousePressEvent = lambda event: self.highlight(event, label)
             self.imageLabels.append(label)
-            self.gallerygrid.addWidget(label, self.j, self.i)
+            self.gallerygrid.addWidget(label, self.i, self.j)
 
             self.i = self.i + 1
             if self.i == self.rows:
@@ -178,6 +168,8 @@ class Ui_PreviewWindow(QMainWindow):
     def loadImages(self, selected, rows, cols):
         self.rows = rows
         self.cols = cols
+        print(rows)
+        print(cols)
         self.selected = selected
         self.setupGrid()
         for filename in self.selected:
