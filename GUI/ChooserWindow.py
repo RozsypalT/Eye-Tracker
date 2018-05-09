@@ -10,8 +10,9 @@ from ResultsWindow import Ui_ResultsWindow
 
 
 class Ui_ChooserWindow(QMainWindow):
-    def __init__(self, mainWin):
+    def __init__(self, mainWin, plugin):
         super().__init__()
+        self.plugin = plugin
         self.finished = False
         self.chosenImages = []
         self.mainWin = mainWin
@@ -23,6 +24,7 @@ class Ui_ChooserWindow(QMainWindow):
         self.cols = 0
         self.highlighted = []
         self.setupUi(self)
+        self.tileDetect()
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -153,3 +155,6 @@ class Ui_ChooserWindow(QMainWindow):
 
         for i in range(0, self.cols):
             self.gallerygrid.setColumnStretch(i, 1)
+        
+    def tileDetect(self):
+        print(self.plugin.getblinkpos())

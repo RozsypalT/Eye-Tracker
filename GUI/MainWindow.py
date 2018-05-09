@@ -10,8 +10,9 @@ from PreviewWindow import Ui_PreviewWindow
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
-    def __init__(self, app):
+    def __init__(self, app, plugin):
         super().__init__()
+        self.plugin = plugin
         self.app = app
         self.title = 'Image Chooser'
         self.width = 1000
@@ -231,7 +232,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.close()
 
     def startImageChooserProcess(self):
-        self.chooserWin = Ui_ChooserWindow(self)
+        self.chooserWin = Ui_ChooserWindow(self, self.plugin)
         self.chooserWin.showFullScreen()
         self.chooserWin.loadImages(self.selected, self.x, self.y)
         self.hide()
@@ -245,8 +246,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def updateSelected(self, selected):
         self.selected = selected
 
-def startApp():
+def startApp(plugin):
         app = QtWidgets.QApplication(sys.argv)
-        mainWin = Ui_MainWindow(app)
+        mainWin = Ui_MainWindow(app, plugin)
         mainWin.show()
         sys.exit(app.exec_())
