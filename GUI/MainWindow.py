@@ -98,13 +98,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.layoutbox.currentTextChanged.connect(self.selection)
 
         self.gallery.setGeometry(QtCore.QRect(int(self.window_width/4.5), int(self.window_height/15), int((self.window_width/1.75)), int((self.window_height/1.3))))
-        print(int((self.window_width/1.75)))
-        print(int((self.window_height / 1.3)))
         self.gallery.setWidgetResizable(True)
         self.gallery.setFixedWidth(int((self.window_width/1.75)))
         self.gallery.setObjectName("gallery")
-        print(str((self.window_width / 1.75) / 3.75))
-        print(str((self.window_height / 1.3) / 3.5))
         self.gallerycontents.setGeometry(QtCore.QRect(0, 0, int((self.window_width/1.75)), int((self.window_height/1.3))))
         self.gallerycontents.setObjectName("scrollAreaWidgetContents")
 
@@ -118,7 +114,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def addPictures(self):
         file = QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileName()", "",
                                                "Image Files (*.png *.jpg)")
-        print(file)
         for l in range(0, len(file[0])):
 
             filename = file[0][l]
