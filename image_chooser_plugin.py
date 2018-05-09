@@ -24,6 +24,8 @@ class Image_Chooser(Plugin):
         self.offset_confidence_threshold = offset_confidence_threshold
         self.history = deque()
         self.i = 0
+        self.posx = 0
+        self.posy = 0
 
     def init_ui(self):
         def close():
@@ -33,11 +35,14 @@ class Image_Chooser(Plugin):
         self.menu.label = 'Image Chooser'
         help_str = "After you press start the main application window appears."
         self.menu.append(ui.Info_Text(help_str))
-        self.menu.append(ui.Button('Start', Thread(target=startApp,name="startApp").start, outer_label='Start the main application'))
+        self.menu.append(ui.Button('Start', Thread(target=startApp, name="startApp", args=[self]).start, outer_label='Start the main application'))
 
     def deinit_ui(self):
         self.remove_menu()
         
+    def getblinkpos(self):
+        return [self.posx, self.posy]
+
     def recent_events(self, events={}):
         # add new gaze positions
         self.queue.extend(events['gaze_positions'])
@@ -49,8 +54,6 @@ class Image_Chooser(Plugin):
             if gp['timestamp'] < now - self.store_duration:
                 del self.queue[:idx]
         
-        #print(self.queue)
-        #print("444")
         data = self.queue.pop()
         gaze_pos = data['norm_pos']
         x = gaze_pos[0]
@@ -88,10 +91,11 @@ class Image_Chooser(Plugin):
         
         if blinked:
             print("x: ")
+            self.posx = x
             print(x)
             print("y: ")
+            self.posy = y
             print(y)
             
             self.i = self.i + 1
             blinked = False
-        
