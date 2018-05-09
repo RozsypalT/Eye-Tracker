@@ -2,10 +2,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
 
+
+
 class Ui_ResultsWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, mainWin):
         super().__init__()
         self.chosenImages = []
+        self.mainWin = mainWin
         self.setupUi(self)
 
     def setupUi(self, MainWindow):
@@ -31,7 +34,7 @@ class Ui_ResultsWindow(QMainWindow):
 
         self.closeButton = QtWidgets.QPushButton(self.centralwidget)
         self.closeButton.setObjectName("pushButton")
-        self.closeButton.clicked.connect(lambda: self.close())
+        self.closeButton.clicked.connect(self.closeWin)
         self.gridLayout.addWidget(self.closeButton, 2, 1, 1, 1)
 
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -60,3 +63,7 @@ class Ui_ResultsWindow(QMainWindow):
 
     def setChosenImages(self, chosenImages):
         self.chosenImages = chosenImages
+
+    def closeWin(self):
+        self.mainWin.show()
+        self.close()

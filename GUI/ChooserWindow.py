@@ -6,15 +6,17 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
+
 from ResultsWindow import Ui_ResultsWindow
 
 
 class Ui_ChooserWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, mainWin):
         super().__init__()
         self.finished = False
         self.chosenImages = []
-        self.resWin = Ui_ResultsWindow()
+        self.mainWin = mainWin
+        self.resWin = Ui_ResultsWindow(self.mainWin)
         self.setupUi(self)
 
     def setupUi(self, MainWindow):
@@ -29,7 +31,7 @@ class Ui_ChooserWindow(QMainWindow):
 
         self.finishButton = QtWidgets.QPushButton(self.centralwidget)
         self.finishButton.setObjectName("pushButton_3")
-        self.finishButton.clicked.connect(lambda: self.showResults())
+        self.finishButton.clicked.connect(self.showResults)
         self.gridLayout.addWidget(self.finishButton, 1, 2, 1, 1)
 
         self.backButton = QtWidgets.QPushButton(self.centralwidget)
@@ -42,7 +44,7 @@ class Ui_ChooserWindow(QMainWindow):
 
         self.closeButton = QtWidgets.QPushButton(self.centralwidget)
         self.closeButton.setObjectName("pushButton")
-        self.closeButton.clicked.connect(lambda: self.close())
+        self.closeButton.clicked.connect(self.close)
         self.gridLayout.addWidget(self.closeButton, 1, 3, 1, 1)
 
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -98,9 +100,9 @@ class Ui_ChooserWindow(QMainWindow):
 
         if ans == QMessageBox.Ok:
             self.finished = True
-            self.close()
             self.resWin.setChosenImages(self.chosenImages)
             self.resWin.show()
+            self.close()
 
 
     def closeEvent(self, QCloseEvent):
@@ -115,12 +117,9 @@ class Ui_ChooserWindow(QMainWindow):
 
             ans = alert.exec_()
             if ans == QMessageBox.Ok:
+                self.mainWin.show()
                 self.close()
             else:
                 QCloseEvent.ignore()
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    mainWin = Ui_ChooserWindow()
-    mainWin.showFullScreen()
-    sys.exit(app.exec_())
+        else:
+            self.close()
