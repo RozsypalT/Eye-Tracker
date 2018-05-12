@@ -1,4 +1,3 @@
-
 import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -7,6 +6,7 @@ from PyQt5.QtGui import QCloseEvent, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
 
 from ResultsWindow import Ui_ResultsWindow
+from threading import Thread
 
 
 class Ui_ChooserWindow(QMainWindow):
@@ -24,7 +24,8 @@ class Ui_ChooserWindow(QMainWindow):
         self.cols = 0
         self.highlighted = []
         self.setupUi(self)
-        self.tileDetect()
+        self.num = -1
+        self.num2 = -1
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -102,7 +103,6 @@ class Ui_ChooserWindow(QMainWindow):
             self.resWin.show()
             self.close()
 
-
     def closeEvent(self, QCloseEvent):
         if not self.finished:
             alert = QMessageBox()
@@ -132,8 +132,8 @@ class Ui_ChooserWindow(QMainWindow):
         label.setPixmap(modpixmap)
         label.setAlignment(Qt.AlignCenter)
         label.setStyleSheet("background-color: white")
-        #label.mousePressEvent = lambda event: self.highlight(event, label)
-        #self.imageLabels.append(label)
+        # label.mousePressEvent = lambda event: self.highlight(event, label)
+        # self.imageLabels.append(label)
         self.gallerygrid.addWidget(label, self.i, self.j)
 
         self.i = self.i + 1
@@ -156,5 +156,10 @@ class Ui_ChooserWindow(QMainWindow):
         for i in range(0, self.cols):
             self.gallerygrid.setColumnStretch(i, 1)
         
-    def tileDetect(self):
-        print(self.plugin.getblinkpos())
+    def setNums(self, num, num2):
+        self.num = num
+        self.num2 = num2
+        print(self.num)
+        print(self.num2)
+        
+        

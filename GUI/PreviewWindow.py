@@ -8,9 +8,7 @@ class Ui_PreviewWindow(QMainWindow):
     def __init__(self, mainWin):
         super().__init__()
         self.setupUi(self)
-        self.images = []
         self.imageLabels = []
-        self.clickedImages = 0
         self.firstIndex = 0
         self.secondIndex = 0
         self.mainWin = mainWin

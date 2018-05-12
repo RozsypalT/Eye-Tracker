@@ -10,6 +10,14 @@ from MainWindow import*
 from threading import Thread
 import numpy as np
 from collections import deque
+import sys
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+
+from ChooserWindow import Ui_ChooserWindow
+from PreviewWindow import Ui_PreviewWindow
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +31,9 @@ class Image_Chooser(Plugin):
         self.onset_confidence_threshold = onset_confidence_threshold
         self.offset_confidence_threshold = offset_confidence_threshold
         self.history = deque()
-        self.i = 0
         self.posx = 0
         self.posy = 0
+        self.mainWin = None
 
     def init_ui(self):
         def close():
@@ -35,15 +43,18 @@ class Image_Chooser(Plugin):
         self.menu.label = 'Image Chooser'
         help_str = "After you press start the main application window appears."
         self.menu.append(ui.Info_Text(help_str))
-        self.menu.append(ui.Button('Start', Thread(target=startApp, name="startApp", args=[self]).start, outer_label='Start the main application'))
+        self.menu.append(ui.Button('Start', Thread(target=self.main, name="startApp", args=[self]).start, outer_label='Start the main application'))
 
     def deinit_ui(self):
         self.remove_menu()
         
     def getblinkpos(self):
-        return [self.posx, self.posy]
+        return [0, 0]
 
     def recent_events(self, events={}):
+        if self.mainWin == None or not self.mainWin.isChooser():
+            return
+        
         # add new gaze positions
         self.queue.extend(events['gaze_positions'])
         #print(events['gaze_positions'])
@@ -53,7 +64,8 @@ class Image_Chooser(Plugin):
         for idx, gp in enumerate(self.queue):
             if gp['timestamp'] < now - self.store_duration:
                 del self.queue[:idx]
-        
+        if len(self.queue) == 0:
+            return
         data = self.queue.pop()
         gaze_pos = data['norm_pos']
         x = gaze_pos[0]
@@ -90,12 +102,17 @@ class Image_Chooser(Plugin):
         confidence = min(abs(filter_response), 1.)  # clamp conf. value at 1.
         
         if blinked:
-            print("x: ")
+         #   print("x: ")
             self.posx = x
-            print(x)
-            print("y: ")
+         #   print(x)
+         #   print("y: ")
             self.posy = y
-            print(y)
-            
-            self.i = self.i + 1
+         #   print(y)
+            self.mainWin.getChooser().setNums(x, y)
             blinked = False
+            
+    def main(self, plugin):
+        app = QtWidgets.QApplication(sys.argv)
+        self.mainWin = Ui_MainWindow(app, plugin)
+        self.mainWin.show()
+        sys.exit(app.exec_())

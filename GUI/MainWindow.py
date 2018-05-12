@@ -15,11 +15,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.plugin = plugin
         self.app = app
         self.title = 'Image Chooser'
-        self.width = 1000
-        self.height = 800
         self.selected = []
         screen = app.primaryScreen()
-        self.height = 800
         size = screen.size()
         self.window_width = int(size.width() / 1.75)
         self.window_height = int((3.5 * size.height()) / 5)
@@ -45,7 +42,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.gallerygrid.setRowStretch(1, 10)
         self.gallerygrid.setRowStretch(2, 10)
         self.labellist = []
-        self.testlabel = QLabel(self)
         self.highlighted = None
         self.i = 0
         self.j = 0
@@ -97,7 +93,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.helpbutton.setGeometry(
             QtCore.QRect(int(self.window_width / 15), int(5 * (self.window_height / 15)), int(self.window_width / 10),
                          int(self.window_height / 25)))
-        self.helpbutton.clicked.connect(self.startImageChooserProcess)
+        self.helpbutton.clicked.connect(self.showHelp)
         self.helpbutton.setObjectName("pushButton_4")
 
         self.startbutton.setText("Start")
@@ -245,9 +241,25 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def updateSelected(self, selected):
         self.selected = selected
+        
+    def isChooser(self):
+        if self.chooserWin is None:
+            return False
+        
+        return True
+        
+    def getChooser(self):
+        return self.chooserWin
 
-def startApp(plugin):
-        app = QtWidgets.QApplication(sys.argv)
-        mainWin = Ui_MainWindow(app, plugin)
-        mainWin.show()
-        sys.exit(app.exec_())
+    def showHelp(self):
+        help = QMessageBox()
+        help.setIcon(QMessageBox.Information)
+
+        #help.setText("This is a message box")
+        help.setInformativeText("To start the image choosing process press the Start button.\n" +
+            "Before starting the program you must add a number of pictures equal to the layout you had chosen.\n" + 
+            "You can press the Preview button to see how the chooser window is going to look like. You can reorder added pictures there.\n")
+        help.setWindowTitle("Help")
+        help.setStandardButtons(QMessageBox.Ok)
+        help.buttonClicked.connect(help.close)
+        help.exec_()
