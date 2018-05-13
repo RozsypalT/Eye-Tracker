@@ -2,7 +2,7 @@ import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QCloseEvent, QPixmap
+from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
 
 from ResultsWindow import Ui_ResultsWindow
@@ -29,6 +29,7 @@ class Ui_ChooserWindow(QMainWindow):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(700, 500)
+        MainWindow.setWindowIcon(QtGui.QIcon("icon.png"))
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -87,6 +88,7 @@ class Ui_ChooserWindow(QMainWindow):
     def showResults(self):
         alert = QMessageBox()
         alert.setIcon(QMessageBox.Information)
+        alert.setWindowIcon(QtGui.QIcon("icon.png"))
 
         alert.setText("Finish the image choosing process!")
         alert.setInformativeText("Do you want to finish the process and show the results?")
@@ -106,6 +108,7 @@ class Ui_ChooserWindow(QMainWindow):
         if not self.finished:
             alert = QMessageBox()
             alert.setIcon(QMessageBox.Information)
+            alert.setWindowIcon(QtGui.QIcon("icon.png"))
 
             alert.setText("Closing the image choosing window!")
             alert.setInformativeText("Do you really want to close this window?")

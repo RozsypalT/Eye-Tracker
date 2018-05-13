@@ -55,6 +55,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(self.window_width, self.window_height)
         MainWindow.setWindowTitle(self.title)
+        MainWindow.setWindowIcon(QtGui.QIcon("icon.png")) 
 
         self.centralwidget.setObjectName("centralwidget")
 
@@ -254,6 +255,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def showHelp(self):
         help = QMessageBox()
         help.setIcon(QMessageBox.Information)
+        help.setWindowIcon(QtGui.QIcon("icon.png"))
 
         #help.setText("This is a message box")
         help.setInformativeText("To start the image choosing process press the Start button.\n" +
