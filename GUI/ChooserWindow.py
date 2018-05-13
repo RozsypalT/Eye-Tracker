@@ -10,9 +10,8 @@ from threading import Thread
 
 
 class Ui_ChooserWindow(QMainWindow):
-    def __init__(self, mainWin, plugin):
+    def __init__(self, mainWin):
         super().__init__()
-        self.plugin = plugin
         self.finished = False
         self.chosenImages = []
         self.mainWin = mainWin

@@ -12,8 +12,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, app, plugin):
         super().__init__()
-        self.plugin = plugin
         self.app = app
+        self.plugin = plugin
         self.title = 'Image Chooser'
         self.selected = []
         screen = app.primaryScreen()
@@ -228,7 +228,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.close()
 
     def startImageChooserProcess(self):
-        self.chooserWin = Ui_ChooserWindow(self, self.plugin)
+        self.chooserWin = Ui_ChooserWindow(self)
         self.chooserWin.showFullScreen()
         self.chooserWin.loadImages(self.selected, self.x, self.y)
         self.hide()
@@ -263,3 +263,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         help.setStandardButtons(QMessageBox.Ok)
         help.buttonClicked.connect(help.close)
         help.exec_()
+        
+    def closeEvent(self, QCloseEvent):
+        self.plugin.setMainNone()
+        self.close()

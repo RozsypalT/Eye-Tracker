@@ -166,8 +166,6 @@ class Ui_PreviewWindow(QMainWindow):
     def loadImages(self, selected, rows, cols):
         self.rows = rows
         self.cols = cols
-        print(rows)
-        print(cols)
         self.selected = selected
         self.setupGrid()
         for filename in self.selected:
@@ -179,3 +177,7 @@ class Ui_PreviewWindow(QMainWindow):
 
         for i in range(0, self.cols):
             self.gallerygrid.setColumnStretch(i, 1)
+
+    def closeEvent(self, QCloseEvent):
+        self.mainWin.show()
+        self.close()

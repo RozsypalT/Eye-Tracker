@@ -1,5 +1,4 @@
 import sys
-#sys.path.append('C:/')
 from plugin import Plugin
 from time import time, strftime, gmtime
 from pyglui import ui
@@ -43,7 +42,8 @@ class Image_Chooser(Plugin):
         self.menu.label = 'Image Chooser'
         help_str = "After you press start the main application window appears."
         self.menu.append(ui.Info_Text(help_str))
-        self.menu.append(ui.Button('Start', Thread(target=self.main, name="startApp", args=[self]).start, outer_label='Start the main application'))
+        self.menu.append(ui.Button('Start', self.startThread, outer_label='Start the main application'))
+        self.menu.append(ui.Button('Close', close, outer_label='Closes the plugin'))
 
     def deinit_ui(self):
         self.remove_menu()
@@ -52,13 +52,12 @@ class Image_Chooser(Plugin):
         return [0, 0]
 
     def recent_events(self, events={}):
-        if self.mainWin == None or not self.mainWin.isChooser():
+        if self.mainWin is None or not self.mainWin.isChooser():
             return
         
         # add new gaze positions
         self.queue.extend(events['gaze_positions'])
         #print(events['gaze_positions'])
-
         now = self.g_pool.get_timestamp()
         # remove outdated gaze positions
         for idx, gp in enumerate(self.queue):
@@ -114,5 +113,14 @@ class Image_Chooser(Plugin):
     def main(self, plugin):
         app = QtWidgets.QApplication(sys.argv)
         self.mainWin = Ui_MainWindow(app, plugin)
-        self.mainWin.show()
-        sys.exit(app.exec_())
+        self.mainWin.show()        
+        sys.exit(app.exec_()) 
+        
+    def startThread(self):
+        if self.mainWin is None:
+            t = Thread(target=self.main, args=[self])
+            t.start()
+            
+    def setMainNone(self):
+        self.mainWin = None
+        

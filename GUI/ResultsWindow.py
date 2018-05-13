@@ -34,7 +34,7 @@ class Ui_ResultsWindow(QMainWindow):
 
         self.closeButton = QtWidgets.QPushButton(self.centralwidget)
         self.closeButton.setObjectName("pushButton")
-        self.closeButton.clicked.connect(self.closeWin)
+        self.closeButton.clicked.connect(self.close)
         self.gridLayout.addWidget(self.closeButton, 2, 1, 1, 1)
 
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -63,7 +63,7 @@ class Ui_ResultsWindow(QMainWindow):
 
     def setChosenImages(self, chosenImages):
         self.chosenImages = chosenImages
-
-    def closeWin(self):
+        
+    def closeEvent(self, QCloseEvent):
         self.mainWin.show()
         self.close()
