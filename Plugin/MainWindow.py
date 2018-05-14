@@ -7,9 +7,8 @@ from PyQt5.QtCore import *
 
 from ChooserWindow import Ui_ChooserWindow
 from PreviewWindow import Ui_PreviewWindow
-
+# defines main window of the application
 class Ui_MainWindow(QtWidgets.QMainWindow):
-
     def __init__(self, app, plugin):
         super().__init__()
         self.app = app
@@ -51,6 +50,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.previewWin = None
         self.setupUi(self)
 
+    #initializes UI
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(self.window_width, self.window_height)
@@ -60,7 +60,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.centralwidget.setObjectName("centralwidget")
 
         self.gallerylabel.setGeometry(
-            QtCore.QRect(int(self.window_width / 4.5), int(0.5 * self.window_height / 15), int(self.window_width / 10),
+            QtCore.QRect(int(self.window_width / 4), int(0.5 * self.window_height / 15), int(self.window_width / 10),
                          int(self.window_height / 25)))
         self.gallerylabel.setText("Selected pictures:")
 
@@ -143,14 +143,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         MainWindow.setCentralWidget(self.centralwidget)
 
-
+    # returns value of strong selected in combobox
     def selection(self, value):
         str_res = value.split("x")
         self.x = int(str_res[0])
         self.y = int(str_res[1])
-        self.imgcountlabel.setText("Number of selected pictures: " + str(len(self.selected)) + ". " + str(
-            self.x * self.y - len(self.selected)) + " more pictures needed.")
+        self.labelText()
 
+    # gets path to the picture selected by user
     def addPictures(self):
         file = QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileName()", "",
                                                "Image Files (*.png *.jpg)")
@@ -160,9 +160,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             filename = file[0][l]
             self.loadPicture(filename)
 
-        self.imgcountlabel.setText("Number of selected pictures: " + str(len(self.selected)) + ". " + str(
-            self.x * self.y - len(self.selected)) + " more pictures needed.")
+            self.labelText()
 
+    # removes selected picture from the gallery
     def removePicture(self):
         k = 0
         l = 0
@@ -188,10 +188,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             lab.show()
         self.i = k
         self.j = l
+        self.labelText()
 
-        self.imgcountlabel.setText("Number of selected pictures: " + str(len(self.selected)) + ". " + str(
-            self.x * self.y - len(self.selected)) + " more pictures needed.")
-
+    # highlights picture when clicked on
     def highlight(self, event, label):
         if self.highlighted is None:
             label.setStyleSheet("border: 5px inset red")
@@ -204,6 +203,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.highlighted = label
             label.setStyleSheet("border: 5px inset red")
 
+    # loads picture from user defined path
     def loadPicture(self, filename):
         if filename == '':
             return
@@ -225,33 +225,62 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.i = 0
             self.j = self.j + 1
 
+    # closes window
     def quit(self):
         self.close()
 
+    # defines text of label which inform user about amount of added pictures and amount of pictures needed
+    def labelText(self):
+        if (self.x*self.y - len(self.selected) > 0):
+            self.imgcountlabel.setText("Number of selected pictures: " + str(len(self.selected)) + ". " + str(
+                self.x * self.y - len(self.selected)) + " more pictures needed.")
+        elif (self.x*self.y - len(self.selected) < 0):
+            self.imgcountlabel.setText("Number of selected pictures: " + str(len(self.selected)) + ". " + str(
+                len(self.selected) - self.x * self.y) + " pictures must be removed.")
+        else:
+            self.imgcountlabel.setText("Number of selected pictures: " + str(len(self.selected)) + ". No more pictures have to be added.")
+
+    # starts the image choosing process when conditions are met
     def startImageChooserProcess(self):
+        if len(self.selected) != (self.x*self.y):
+            warn = QMessageBox()
+            warn.setIcon(QMessageBox.Warning)
+            warn.setWindowIcon(QtGui.QIcon("icon.png"))
+            warn.setInformativeText("To start the image choosing process exact number of pictures must be selected.")
+            warn.setWindowTitle("Warning")
+            warn.setStandardButtons(QMessageBox.Ok)
+            warn.buttonClicked.connect(warn.close)
+            warn.exec_()
+            return
+
         self.chooserWin = Ui_ChooserWindow(self)
         self.chooserWin.showFullScreen()
         self.chooserWin.loadImages(self.selected, self.x, self.y)
         self.hide()
 
+    # show preview window
     def startPreviewProcess(self):
         self.hide()
         self.previewWin = Ui_PreviewWindow(self)
         self.previewWin.show()
         self.previewWin.loadImages(self.selected, self.x, self.y)
 
+    # updates the list of selected pictures when changed in preview window
     def updateSelected(self, selected):
         self.selected = selected
-        
+
+    # checks if instance of chooser window exists
     def isChooser(self):
         if self.chooserWin is None:
             return False
         
         return True
-        
+
+    # return instance of chooser window
     def getChooser(self):
         return self.chooserWin
 
+    # displays help message
     def showHelp(self):
         help = QMessageBox()
         help.setIcon(QMessageBox.Information)
@@ -265,7 +294,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         help.setStandardButtons(QMessageBox.Ok)
         help.buttonClicked.connect(help.close)
         help.exec_()
-        
+
+    # defines event that closes window and sets plugin attribute of main window to none
     def closeEvent(self, QCloseEvent):
         self.plugin.setMainNone()
         self.close()
