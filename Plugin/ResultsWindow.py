@@ -96,5 +96,5 @@ class Ui_ResultsWindow(QMainWindow):
         """Loads images.
         Is called from the chooser window"""
         self.chosenImages = chosenImages
-        for filename in self.choosenImages:
+        for filename in self.chosenImages:
             self.organizeImages(filename)
