@@ -21,10 +21,9 @@ class Ui_ChooserWindow(QMainWindow):
         self.selected = []
         self.rows = 0
         self.cols = 0
-        self.highlighted = []
+        self.highlighted = None
+        self.labellist = []
         self.setupUi(self)
-        self.num = -1
-        self.num2 = -1
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -134,8 +133,7 @@ class Ui_ChooserWindow(QMainWindow):
         label.setPixmap(modpixmap)
         label.setAlignment(Qt.AlignCenter)
         label.setStyleSheet("background-color: white")
-        # label.mousePressEvent = lambda event: self.highlight(event, label)
-        # self.imageLabels.append(label)
+        self.labellist.append(label)
         self.gallerygrid.addWidget(label, self.i, self.j)
 
         self.i = self.i + 1
@@ -158,10 +156,17 @@ class Ui_ChooserWindow(QMainWindow):
         for i in range(0, self.cols):
             self.gallerygrid.setColumnStretch(i, 1)
         
-    def setNums(self, num, num2):
-        self.num = num
-        self.num2 = num2
-        print(self.num)
-        print(self.num2)
+    def highlight(self, i, j):
+        print(i)
+        print(j)
+        if self.highlighted is None:
+            self.labellist[i * self.cols + j].setStyleSheet("border: 5px inset red")
+            self.highlighted = self.selected[i * self.cols + j]
+        
+    def getRows(self):
+        return self.rows
+        
+    def getCols(self):
+        return self.cols
         
         

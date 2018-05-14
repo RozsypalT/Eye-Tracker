@@ -30,8 +30,6 @@ class Image_Chooser(Plugin):
         self.onset_confidence_threshold = onset_confidence_threshold
         self.offset_confidence_threshold = offset_confidence_threshold
         self.history = deque()
-        self.posx = 0
-        self.posy = 0
         self.mainWin = None
 
     def init_ui(self):
@@ -69,6 +67,7 @@ class Image_Chooser(Plugin):
         gaze_pos = data['norm_pos']
         x = gaze_pos[0]
         y = gaze_pos[1]
+        blinked = False
         
         self.history.extend(events.get('pupil_positions', []))
 
@@ -99,16 +98,21 @@ class Image_Chooser(Plugin):
             blinked = True
 
         confidence = min(abs(filter_response), 1.)  # clamp conf. value at 1.
-        
-        if blinked:
-         #   print("x: ")
-            self.posx = x
-         #   print(x)
-         #   print("y: ")
-            self.posy = y
-         #   print(y)
-            self.mainWin.getChooser().setNums(x, y)
-            blinked = False
+        y = 1 - y
+        if (x < 0.7 and y < 0.7 and x >= 0.3 and x >= 0.3):
+            print(x)
+            print(y)
+             
+            rows = self.mainWin.getChooser().getRows()
+            cols = self.mainWin.getChooser().getCols()
+            posx = ((x - 0.3)/(0.7-0.3))/(1/rows)
+            posy = ((y - 0.3)/(0.7-0.3))/(1/cols)
+            print("Pred")
+            print(posx)
+            print(posy)
+            posx = int(posx)
+            posy = int(posy)
+            self.mainWin.getChooser().highlight(posx, posy)
             
     def main(self, plugin):
         app = QtWidgets.QApplication(sys.argv)
