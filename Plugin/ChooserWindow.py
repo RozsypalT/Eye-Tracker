@@ -167,14 +167,14 @@ class Ui_ChooserWindow(QMainWindow):
 
     # highlights selected pictures
     def highlight(self, i, j):
-        #print(i)
-        #print(j)
+        print(i)
+        print(j)
         if self.labellist[i * self.cols + j] not in self.highlighted:
             self.labellist[i * self.cols + j].setStyleSheet("border: 5px inset red")
             self.highlighted.append(self.labellist[i * self.cols + j])
-            for i, lab in enumerate(self.labellist):
+            for ind, lab in enumerate(self.labellist):
                 if lab == self.labellist[i * self.cols + j]:
-                    index = i
+                    index = ind
                     break
             self.chosenImages.append(self.selected[index])
         else:

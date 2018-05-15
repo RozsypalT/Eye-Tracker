@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
 from PyQt5.QtGui import *
+from PyQt5.QtCore import Qt
 
 class Ui_ResultsWindow(QMainWindow):
     """Class representing the results window that is shown after the image choosing
@@ -27,6 +28,8 @@ class Ui_ResultsWindow(QMainWindow):
         self.gridLayout.setObjectName("gridLayout")
         
         self.gallery = QtWidgets.QScrollArea(self.centralwidget)    # a scroll area where images will be shown
+        #self.gallery.setGeometry(QtCore.QRect(150, 70, 291, 281))
+        self.gallery.setWidgetResizable(True)
         self.gallerycontents = QtWidgets.QWidget()    # a widget that holds images
         self.gallerygrid = QtWidgets.QGridLayout(self.gallerycontents)    # grid layout for the widget with images
         # setting up the grid
@@ -36,6 +39,7 @@ class Ui_ResultsWindow(QMainWindow):
         self.gallerygrid.setRowStretch(0, 10)
         self.gallerygrid.setRowStretch(1, 10)
         self.gallerygrid.setRowStretch(2, 10)
+        self.gallery.setWidget(self.gallerycontents)
         self.gridLayout.addWidget(self.gallery, 1, 0, 1, 3)   # adds scroll area to the main layout
         # spacer items for placing the buttons
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -78,8 +82,8 @@ class Ui_ResultsWindow(QMainWindow):
         """Puts images into scroll area"""
         if filename == '':
             return
-        label = QLabel(self.frame)    # label that holds the pixmap
-        pixmap = QPixmap(filename)    # pixmap that hold the image
+        label = QLabel(self.gallerycontents)    # label that holds the pixmap
+        pixmap = QPixmap(filename)    # pixmap that holds the image
         label.setFixedSize(100, 100)
         modpixmap = pixmap.scaled(90, 90)
         label.setPixmap(modpixmap)
