@@ -9,10 +9,8 @@ class Ui_ResultsWindow(QMainWindow):
     def __init__(self, mainWin):
         """Initializes the class"""
         super().__init__()
-        self.chosenImages = []    # list of choosen image names
+        self.chosenImage = None    # choosen image name
         self.mainWin = mainWin    # main window object
-        self.i = 0    # i index of the grid
-        self.j = 0    # j index of the grid
         self.setupUi(self)
 
     def setupUi(self, MainWindow):
@@ -28,17 +26,10 @@ class Ui_ResultsWindow(QMainWindow):
         self.gridLayout.setObjectName("gridLayout")
         
         self.gallery = QtWidgets.QScrollArea(self.centralwidget)    # a scroll area where images will be shown
-        #self.gallery.setGeometry(QtCore.QRect(150, 70, 291, 281))
+        self.gallery.setGeometry(QtCore.QRect(150, 70, 291, 281))
         self.gallery.setWidgetResizable(True)
         self.gallerycontents = QtWidgets.QWidget()    # a widget that holds images
         self.gallerygrid = QtWidgets.QGridLayout(self.gallerycontents)    # grid layout for the widget with images
-        # setting up the grid
-        self.gallerygrid.setColumnStretch(0, 10)
-        self.gallerygrid.setColumnStretch(1, 10)
-        self.gallerygrid.setColumnStretch(2, 10)
-        self.gallerygrid.setRowStretch(0, 10)
-        self.gallerygrid.setRowStretch(1, 10)
-        self.gallerygrid.setRowStretch(2, 10)
         self.gallery.setWidget(self.gallerycontents)
         self.gridLayout.addWidget(self.gallery, 1, 0, 1, 3)   # adds scroll area to the main layout
         # spacer items for placing the buttons
@@ -71,34 +62,28 @@ class Ui_ResultsWindow(QMainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Results"))
         self.closeButton.setText(_translate("MainWindow", "Close"))
-        self.label.setText(_translate("MainWindow", "Chosen pictures: "))
+        self.label.setText(_translate("MainWindow", "Chosen picture: "))
         
     def closeEvent(self, QCloseEvent):
         """Defines a close event that shows the main window and closes results window"""
         self.mainWin.show()
         self.close()
         
-    def organizeImages(self, filename):
+    def organizeImage(self, filename):
         """Puts images into scroll area"""
         if filename == '':
             return
         label = QLabel(self.gallerycontents)    # label that holds the pixmap
         pixmap = QPixmap(filename)    # pixmap that holds the image
-        label.setFixedSize(100, 100)
-        modpixmap = pixmap.scaled(90, 90)
+        label.setFixedSize(300, 300)
+        modpixmap = pixmap.scaled(290, 290)
         label.setPixmap(modpixmap)
         label.setAlignment(Qt.AlignCenter)
         label.setStyleSheet("background-color: white")
-        self.gallerygrid.addWidget(label, self.i, self.j)
+        self.gallerygrid.addWidget(label, 0, 0)
 
-        self.i = self.i + 1
-        if self.i == 3:   # 3 columns
-            self.i = 0
-            self.j = self.j + 1
-
-    def loadImages(self, chosenImages):
+    def loadImages(self, chosenImage):
         """Loads images.
         Is called from the chooser window"""
-        self.chosenImages = chosenImages
-        for filename in self.chosenImages:
-            self.organizeImages(filename)
+        self.chosenImage = chosenImage
+        self.organizeImage(self.chosenImage)

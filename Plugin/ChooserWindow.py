@@ -4,9 +4,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
-
 from ResultsWindow import Ui_ResultsWindow
 from threading import Thread
+from time import *
 
 # defines image choosing window
 class Ui_ChooserWindow(QMainWindow):
@@ -15,7 +15,7 @@ class Ui_ChooserWindow(QMainWindow):
         self.window_width = mainWin.window_width
         self.window_height = mainWin.window_height
         self.finished = False
-        self.chosenImages = []
+        self.chosenImage = None
         self.mainWin = mainWin
         self.resWin = None
         self.i = 0
@@ -23,9 +23,11 @@ class Ui_ChooserWindow(QMainWindow):
         self.selected = []
         self.rows = 0
         self.cols = 0
-        self.highlighted = []
+        self.highlighted = None
         self.labellist = []
         self.setupUi(self)
+        self.time = 0
+        self.started = True
 
     # initializes UI
     def setupUi(self, MainWindow):
@@ -42,16 +44,13 @@ class Ui_ChooserWindow(QMainWindow):
         self.finishButton = QtWidgets.QPushButton(self.centralwidget)
         self.finishButton.setObjectName("pushButton_3")
         self.finishButton.clicked.connect(self.showResults)
-        self.gridLayout.addWidget(self.finishButton, 1, 2, 1, 1)
+        self.gridLayout.addWidget(self.finishButton, 3, 0, 1, 1)
 
         self.closeButton = QtWidgets.QPushButton(self.centralwidget)
         self.closeButton.setObjectName("pushButton")
         self.closeButton.clicked.connect(self.close)
-        self.gridLayout.addWidget(self.closeButton, 1, 3, 1, 1)
-
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout.addItem(spacerItem, 1, 4, 1, 1)
-
+        self.gridLayout.addWidget(self.closeButton, 4, 0, 1, 1)
+        
         self.frame = QtWidgets.QFrame(self.centralwidget)
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -59,12 +58,11 @@ class Ui_ChooserWindow(QMainWindow):
 
         self.gallerygrid = QtWidgets.QGridLayout(self.frame)
         self.gallerygrid.setObjectName("gridLayout_2")
-        self.gridLayout.addWidget(self.frame, 0, 0, 1, 6)
-
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-
-        self.gridLayout.addItem(spacerItem1, 1, 1, 1, 1)
-
+        self.gridLayout.addWidget(self.frame, 1, 1, 6, 1)
+        
+        self.gridLayout.setColumnStretch(0, 1)
+        self.gridLayout.setColumnStretch(1, 10)
+        
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -104,7 +102,7 @@ class Ui_ChooserWindow(QMainWindow):
         if ans == QMessageBox.Ok:
             self.finished = True
             self.resWin = Ui_ResultsWindow(self.mainWin)
-            self.resWin.loadImages(self.chosenImages)
+            self.resWin.loadImages(self.chosenImage)
             self.resWin.show()
             self.close()
 
@@ -124,10 +122,12 @@ class Ui_ChooserWindow(QMainWindow):
             if ans == QMessageBox.Ok:
                 self.mainWin.show()
                 self.close()
+                self.started = False
             else:
                 QCloseEvent.ignore()
         else:
             self.close()
+            self.started = False
 
     # organizes images into grid in chooser window
     def organizeImages(self, filename):
@@ -167,18 +167,32 @@ class Ui_ChooserWindow(QMainWindow):
 
     # highlights selected pictures
     def highlight(self, i, j):
-        print(i)
-        print(j)
-        if self.labellist[i * self.cols + j] not in self.highlighted:
-            self.labellist[i * self.cols + j].setStyleSheet("border: 5px inset red")
-            self.highlighted.append(self.labellist[i * self.cols + j])
-            for ind, lab in enumerate(self.labellist):
-                if lab == self.labellist[i * self.cols + j]:
-                    index = ind
-                    break
-            self.chosenImages.append(self.selected[index])
-        else:
+        #print(i)
+        #print(j)
+        
+        if self.started is not True:
             return
+        
+        if self.time == 0:
+            self.time = time()
+        elif time() - self.time < 0.5:
+            return
+        else:
+            self.time = time()
+            
+        if self.highlighted is None:
+            self.labellist[i * self.cols + j].setStyleSheet("border: 5px inset red")
+            self.highlighted = self.labellist[i * self.cols + j]
+            self.chosenImage = self.selected[i * self.cols + j]
+        elif self.highlighted == self.labellist[i * self.cols + j]:
+            self.labellist[i * self.cols + j].setStyleSheet("background-color: white")
+            self.highlighted = None
+            self.chosenImage = None
+        else:
+            self.highlighted.setStyleSheet("background-color: white")
+            self.highlighted = self.labellist[i * self.cols + j]
+            self.labellist[i * self.cols + j].setStyleSheet("border: 5px inset red")
+            self.chosenImage = self.selected[i * self.cols + j]
 
     # returns number of rows
     def getRows(self):
@@ -188,4 +202,5 @@ class Ui_ChooserWindow(QMainWindow):
     def getCols(self):
         return self.cols
         
-        
+    def setStarted(self):
+        self.started = True    

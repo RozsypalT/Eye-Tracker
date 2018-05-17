@@ -14,6 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from time import *
 
 from ChooserWindow import Ui_ChooserWindow
 from PreviewWindow import Ui_PreviewWindow
@@ -45,6 +46,7 @@ class Image_Chooser(Plugin):
         self.menu.append(ui.Info_Text(help_str))
         self.menu.append(ui.Button('Start', self.startThread, outer_label='Start the main application'))
         self.menu.append(ui.Button('Close', close, outer_label='Closes the plugin'))
+        self.rest_label = ui.Info_Text("")
 
     def deinit_ui(self):
         """Deinitializes UI"""
@@ -103,21 +105,24 @@ class Image_Chooser(Plugin):
         confidence = min(abs(filter_response), 1.)  # clamp conf. value at 1.
         y = 1 - y   # because (0,0) is in the left bottom corner
         
-        if (x < 0.7 and y < 0.7 and x >= 0.3 and y >= 0.3):
+        if (x < 0.7 and y < 0.7 and x >= 0.4 and y >= 0.3):
             self.calculateXY(x, y)
             
-    def main(self, plugin):
+    def main(self):
         """Initializes PyQt application and starts the application"""
         app = QtWidgets.QApplication(sys.argv)
-        self.mainWin = Ui_MainWindow(app, plugin)
+        self.mainWin = Ui_MainWindow(app)
         self.mainWin.show()        
         sys.exit(app.exec_()) 
         
     def startThread(self):
         """Starts the thread with the application"""
         if self.mainWin is None:
-            t = Thread(target=self.main, args=[self])
+            t = Thread(target=self.main)
             t.start()
+        else:
+            rest_str = "Please restart the application to repeat the process!!!"
+            self.menu.append(ui.Info_Text(rest_str))
             
     def setMainNone(self):
         """Sets main window object to type None"""
@@ -127,7 +132,7 @@ class Image_Chooser(Plugin):
         """Calculates which image should be highlighted and highlights it"""
         rows = self.mainWin.getChooser().getRows()
         cols = self.mainWin.getChooser().getCols()
-        posx = ((x - 0.3)/(0.7-0.3))/(1/rows)
+        posx = ((x - 0.4)/(0.7-0.4))/(1/rows)
         posy = ((y - 0.3)/(0.7-0.3))/(1/cols)
         print("Pred")
         print(posx)
@@ -135,4 +140,5 @@ class Image_Chooser(Plugin):
         posx = int(posx)
         posy = int(posy)
         self.mainWin.getChooser().highlight(posx, posy)   # highlights image user is looking at
+        #sleep(0.25)
         

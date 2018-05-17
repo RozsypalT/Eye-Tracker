@@ -4,15 +4,15 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+import time
 
 from ChooserWindow import Ui_ChooserWindow
 from PreviewWindow import Ui_PreviewWindow
 # defines main window of the application
 class Ui_MainWindow(QtWidgets.QMainWindow):
-    def __init__(self, app, plugin):
+    def __init__(self, app):
         super().__init__()
         self.app = app
-        self.plugin = plugin
         self.title = 'Image Chooser'
         self.selected = []
         screen = app.primaryScreen()
@@ -60,7 +60,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.centralwidget.setObjectName("centralwidget")
 
         self.gallerylabel.setGeometry(
-            QtCore.QRect(int(self.window_width / 4), int(0.5 * self.window_height / 15), int(self.window_width / 10),
+            QtCore.QRect(int(self.window_width / 4.5), int(0.5 * self.window_height / 15), int(self.window_width / 7.5),
                          int(self.window_height / 25)))
         self.gallerylabel.setText("Selected pictures:")
 
@@ -255,6 +255,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.chooserWin = Ui_ChooserWindow(self)
         self.chooserWin.showFullScreen()
+        self.chooserWin.setStarted()
         self.chooserWin.loadImages(self.selected, self.x, self.y)
         self.hide()
 
@@ -294,8 +295,3 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         help.setStandardButtons(QMessageBox.Ok)
         help.buttonClicked.connect(help.close)
         help.exec_()
-
-    # defines event that closes window and sets plugin attribute of main window to none
-    def closeEvent(self, QCloseEvent):
-        self.plugin.setMainNone()
-        self.close()
